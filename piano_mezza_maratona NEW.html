@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Piano Mezza Maratona 2026 · Re→Venaria</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0f0f;
+    --surface: #161818;
+    --surface2: #1e2020;
+    --border: #2a2e2e;
+    --accent: #c8f060;
+    --accent2: #60d4f0;
+    --text: #e8ece8;
+    --muted: #7a8a7a;
+    --scarico: #f0b040;
+    --tapering: #a060f0;
+    --gara: #f06060;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; }
+
+  /* ── HERO ── */
+  .hero { padding:40px 40px 28px; border-bottom:1px solid var(--border); position:relative; overflow:hidden; }
+  .hero::before { content:'21.1'; position:absolute; right:-10px; top:-20px; font-family:'Bebas Neue',sans-serif; font-size:200px; color:var(--accent); opacity:0.04; pointer-events:none; }
+  .hero-label { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--accent); margin-bottom:8px; }
+  .hero-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(40px,7vw,80px); line-height:0.9; margin-bottom:20px; }
+  .hero-title span { color:var(--accent); }
+  .hero-meta { display:flex; gap:24px; flex-wrap:wrap; }
+  .meta-item { display:flex; flex-direction:column; gap:3px; }
+  .meta-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
+  .meta-value { font-size:14px; font-weight:500; }
+  .meta-value.accent { color:var(--accent); }
+
+  /* ── TABS ── */
+  .tabs-nav {
+    display:flex;
+    background:var(--surface);
+    border-bottom:1px solid var(--border);
+    overflow-x:auto;
+    scrollbar-width:none;
+    position:sticky; top:0; z-index:100;
+  }
+  .tabs-nav::-webkit-scrollbar { display:none; }
+  .tab-btn {
+    flex-shrink:0;
+    padding:14px 22px;
+    font-family:'DM Mono',monospace;
+    font-size:11px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--muted);
+    background:transparent;
+    border:none;
+    border-bottom:2px solid transparent;
+    cursor:pointer;
+    transition:all 0.2s;
+    white-space:nowrap;
+  }
+  .tab-btn:hover { color:var(--text); }
+  .tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+  /* ── TAB PANELS ── */
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; }
+
+  /* ── PIANO ── */
+  .legend { display:flex; gap:20px; padding:16px 40px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+  .legend-item { display:flex; align-items:center; gap:8px; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); }
+  .legend-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .phase-header { padding:24px 40px 10px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+  .phase-name { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:2px; }
+  .phase-desc { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); letter-spacing:1px; }
+  .week-grid { padding:0 40px 8px; display:grid; gap:10px; }
+  .week-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+  .week-card.normale { border-left:3px solid var(--accent); }
+  .week-card.scarico { border-left:3px solid var(--scarico); }
+  .week-card.tapering { border-left:3px solid var(--tapering); }
+  .week-card.gara { border-left:3px solid var(--gara); }
+  .week-header { display:grid; grid-template-columns:72px 1fr auto; align-items:center; padding:12px 18px; border-bottom:1px solid var(--border); gap:12px; }
+  .week-num { font-family:'Bebas Neue',sans-serif; font-size:28px; color:var(--muted); line-height:1; }
+  .week-num span { display:block; font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:1px; margin-top:1px; }
+  .week-date { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); }
+  .week-badge { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; padding:3px 9px; border-radius:20px; border:1px solid; }
+  .badge-normale { color:var(--accent); border-color:var(--accent); background:rgba(200,240,96,0.08); }
+  .badge-scarico { color:var(--scarico); border-color:var(--scarico); background:rgba(240,176,64,0.08); }
+  .badge-tapering { color:var(--tapering); border-color:var(--tapering); background:rgba(160,96,240,0.08); }
+  .badge-gara { color:var(--gara); border-color:var(--gara); background:rgba(240,96,96,0.08); }
+  .week-sessions { display:grid; grid-template-columns:1fr 1fr; }
+  .session { padding:14px 18px; }
+  .session:first-child { border-right:1px solid var(--border); }
+  .session-day { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--accent2); margin-bottom:6px; }
+  .session-type { font-size:13px; font-weight:600; margin-bottom:5px; }
+  .session-detail { font-size:12px; color:var(--muted); line-height:1.6; }
+  .session-detail strong { color:var(--accent); font-weight:500; }
+  .session-km { font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--accent); margin-top:8px; }
+  .session-km span { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); }
+  .week-total { padding:9px 18px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:flex-end; gap:8px; background:var(--surface2); }
+  .week-total-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; }
+  .week-total-val { font-family:'Bebas Neue',sans-serif; font-size:18px; }
+  .week-total-val span { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); }
+  .gara-session { padding:28px 20px; text-align:center; }
+  .gara-title { font-family:'Bebas Neue',sans-serif; font-size:44px; color:var(--gara); line-height:1; margin-bottom:8px; }
+  .gara-sub { font-family:'DM Mono',monospace; font-size:12px; color:var(--muted); letter-spacing:1px; line-height:2; }
+
+  /* ── TRACKER ── */
+  .tracker-wrap { padding:32px 40px; }
+  .tracker-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:20px; }
+  .tracker-stat { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:14px; text-align:center; }
+  .tracker-stat-val { font-family:'Bebas Neue',sans-serif; font-size:34px; color:var(--accent); line-height:1; }
+  .tracker-stat-label { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-top:3px; }
+  .tracker-progress-bar { width:100%; height:6px; background:var(--border); border-radius:3px; margin-bottom:28px; overflow:hidden; }
+  .tracker-progress-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:3px; transition:width 0.5s ease; }
+
+  /* AI Coach button */
+  .ai-coach-btn {
+    display:flex; align-items:center; gap:10px;
+    background:linear-gradient(135deg,#1a2a0a,#0a2a2a);
+    border:1px solid var(--accent);
+    border-radius:10px;
+    padding:14px 20px;
+    cursor:pointer;
+    width:100%;
+    margin-bottom:24px;
+    transition:all 0.2s;
+  }
+  .ai-coach-btn:hover { background:linear-gradient(135deg,#223510,#0d3535); }
+  .ai-coach-icon { font-size:22px; }
+  .ai-coach-text { flex:1; text-align:left; }
+  .ai-coach-title { font-size:14px; font-weight:600; color:var(--accent); }
+  .ai-coach-sub { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:1px; margin-top:2px; }
+  .ai-coach-arrow { color:var(--accent); font-size:16px; }
+
+  .ai-response-box {
+    background:var(--surface);
+    border:1px solid var(--accent);
+    border-radius:10px;
+    padding:20px;
+    margin-bottom:24px;
+    display:none;
+  }
+  .ai-response-box.visible { display:block; }
+  .ai-response-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .ai-response-header span { font-family:'DM Mono',monospace; font-size:11px; color:var(--accent); letter-spacing:2px; text-transform:uppercase; }
+  .ai-response-text { font-size:14px; color:var(--text); line-height:1.7; white-space:pre-wrap; }
+  .ai-loading { display:flex; align-items:center; gap:10px; color:var(--muted); font-family:'DM Mono',monospace; font-size:12px; }
+  .ai-loading-dots span { animation:blink 1.2s infinite; }
+  .ai-loading-dots span:nth-child(2) { animation-delay:0.2s; }
+  .ai-loading-dots span:nth-child(3) { animation-delay:0.4s; }
+  @keyframes blink { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+
+  .tracker-weeks { display:grid; gap:8px; }
+  .tracker-week { background:var(--surface2); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+  .tracker-week-header { display:flex; align-items:center; gap:10px; padding:11px 14px; cursor:pointer; user-select:none; }
+  .tracker-week-header:hover { background:rgba(255,255,255,0.03); }
+  .tracker-week-num { font-family:'Bebas Neue',sans-serif; font-size:18px; color:var(--muted); min-width:32px; }
+  .tracker-week-info { flex:1; }
+  .tracker-week-name { font-size:13px; font-weight:600; }
+  .tracker-week-date { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); margin-top:1px; }
+  .tracker-week-pills { display:flex; gap:5px; }
+  .tracker-pill { font-family:'DM Mono',monospace; font-size:10px; padding:2px 7px; border-radius:10px; border:1px solid var(--border); color:var(--muted); white-space:nowrap; }
+  .tracker-pill.done { background:rgba(200,240,96,0.12); border-color:var(--accent); color:var(--accent); }
+  .tracker-pill.partial { background:rgba(240,176,64,0.12); border-color:var(--scarico); color:var(--scarico); }
+  .tracker-arrow { color:var(--muted); font-size:11px; margin-left:4px; }
+  .tracker-week-sessions { border-top:1px solid var(--border); padding:14px; display:none; flex-direction:column; gap:10px; }
+  .tracker-week-sessions.open { display:flex; }
+  .tracker-session-row { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:13px 14px; }
+  .tracker-session-top { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .tracker-checkbox { width:20px; height:20px; border-radius:5px; border:2px solid var(--border); background:transparent; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+  .tracker-checkbox.checked { background:var(--accent); border-color:var(--accent); }
+  .tracker-checkbox.checked::after { content:'✓'; color:#000; font-size:12px; font-weight:700; }
+  .tracker-session-label { flex:1; }
+  .tracker-session-day-label { font-family:'DM Mono',monospace; font-size:10px; color:var(--accent2); letter-spacing:2px; text-transform:uppercase; }
+  .tracker-session-name { font-size:13px; font-weight:600; margin-top:2px; }
+  .tracker-fields { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; }
+  .tracker-field { display:flex; flex-direction:column; gap:3px; }
+  .tracker-field label { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; }
+  .tracker-field input, .tracker-field textarea { background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:6px 9px; color:var(--text); font-family:'DM Mono',monospace; font-size:12px; outline:none; transition:border-color 0.2s; width:100%; }
+  .tracker-field input:focus, .tracker-field textarea:focus { border-color:var(--accent); }
+  .tracker-field textarea { resize:vertical; min-height:46px; }
+  .tracker-save-btn { margin-top:8px; background:var(--accent); color:#000; border:none; border-radius:6px; padding:7px 16px; font-family:'DM Mono',monospace; font-size:11px; font-weight:500; letter-spacing:1px; cursor:pointer; transition:opacity 0.2s; }
+  .tracker-save-btn:hover { opacity:0.85; }
+  .tracker-saved-badge { font-family:'DM Mono',monospace; font-size:10px; color:var(--accent); margin-left:10px; display:none; }
+  .strava-hint { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); margin-top:5px; padding:5px 9px; background:rgba(255,255,255,0.03); border-radius:4px; border-left:2px solid #FC4C02; }
+
+  /* ── NOTE / RITMI ── */
+  .notes-wrap { padding:32px 40px; }
+  .section-title { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:2px; color:var(--accent); margin-bottom:18px; }
+  .section-title.blue { color:var(--accent2); }
+  .section-title.orange { color:var(--scarico); }
+  .notes-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-bottom:32px; }
+  .note-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px; }
+  .note-card h4 { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--accent2); margin-bottom:10px; }
+  .note-card ul { padding-left:15px; }
+  .note-card p, .note-card li { font-size:13px; color:var(--muted); line-height:1.7; }
+
+  /* ── STRETCHING & ALIMENTAZIONE ── */
+  .stretch-wrap { padding:32px 40px; }
+
+  /* ── FOOTER PADDING ── */
+  .panel-bottom { padding-bottom:48px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width:600px) {
+    .hero,.week-grid,.phase-header,.legend,.tracker-wrap,.notes-wrap,.stretch-wrap { padding-left:16px; padding-right:16px; }
+    .week-sessions { grid-template-columns:1fr; }
+    .session:first-child { border-right:none; border-bottom:1px solid var(--border); }
+    .week-header { grid-template-columns:56px 1fr auto; }
+    .tab-btn { padding:12px 14px; font-size:10px; }
+    .tracker-fields { grid-template-columns:1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">Piano di allenamento personalizzato</div>
+  <div class="hero-title">Mezza<br><span>Maratona</span></div>
+  <div class="hero-meta">
+    <div class="meta-item"><div class="meta-label">Inizio</div><div class="meta-value">28 Mag 2026</div></div>
+    <div class="meta-item"><div class="meta-label">Gara</div><div class="meta-value accent">11 Ott 2026</div></div>
+    <div class="meta-item"><div class="meta-label">Luogo</div><div class="meta-value accent">Re → Venaria</div></div>
+    <div class="meta-item"><div class="meta-label">Durata</div><div class="meta-value">20 settimane</div></div>
+    <div class="meta-item"><div class="meta-label">Obiettivo</div><div class="meta-value accent">Sub 2:00:00</div></div>
+    <div class="meta-item"><div class="meta-label">Corse/sett.</div><div class="meta-value">2 (Gio + Dom)</div></div>
+    <div class="meta-item"><div class="meta-label">Livello</div><div class="meta-value">Intermedio</div></div>
+  </div>
+</div>
+
+<!-- TAB NAV -->
+<nav class="tabs-nav">
+  <button class="tab-btn active" onclick="switchTab('tracker')">📊 Tracker</button>
+  <button class="tab-btn" onclick="switchTab('piano')">🗓 Piano</button>
+  <button class="tab-btn" onclick="switchTab('ritmi')">📋 Note & Ritmi</button>
+  <button class="tab-btn" onclick="switchTab('stretching')">🧘 Stretching</button>
+  <button class="tab-btn" onclick="switchTab('alimentazione')">🍽 Alimentazione</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════ TAB: TRACKER -->
+<div id="tab-tracker" class="tab-panel active panel-bottom">
+<div class="tracker-wrap">
+
+  <!-- AI COACH -->
+  <div class="ai-coach-btn" onclick="callAICoach()">
+    <div class="ai-coach-icon">🤖</div>
+    <div class="ai-coach-text">
+      <div class="ai-coach-title">Chiedi al Coach AI</div>
+      <div class="ai-coach-sub">Analizza il tuo andamento e ricevi consigli personalizzati</div>
+    </div>
+    <div class="ai-coach-arrow">▶</div>
+  </div>
+
+  <div class="ai-response-box" id="ai-response-box">
+    <div class="ai-response-header">
+      <span>🤖 Coach AI</span>
+    </div>
+    <div class="ai-response-text" id="ai-response-text"></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="tracker-stats">
+    <div class="tracker-stat"><div class="tracker-stat-val" id="stat-done">0</div><div class="tracker-stat-label">Sessioni completate</div></div>
+    <div class="tracker-stat"><div class="tracker-stat-val" id="stat-total">39</div><div class="tracker-stat-label">Sessioni totali</div></div>
+    <div class="tracker-stat"><div class="tracker-stat-val" id="stat-km">0</div><div class="tracker-stat-label">km percorsi</div></div>
+    <div class="tracker-stat"><div class="tracker-stat-val" id="stat-weeks">0</div><div class="tracker-stat-label">Settimane complete</div></div>
+    <div class="tracker-stat"><div class="tracker-stat-val" id="stat-pct">0%</div><div class="tracker-stat-label">Piano completato</div></div>
+  </div>
+  <div class="tracker-progress-bar"><div class="tracker-progress-fill" id="progress-fill" style="width:0%"></div></div>
+
+  <div class="tracker-weeks" id="tracker-weeks"></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ TAB: PIANO -->
+<div id="tab-piano" class="tab-panel panel-bottom">
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> Normale</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--scarico)"></div> Scarico</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--tapering)"></div> Tapering</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--gara)"></div> Gara</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--accent2)"></div> Gio = qualità · Dom = lungo</div>
+</div>
+
+<!-- FASE 1: BASE -->
+<div class="phase-header">
+  <div class="phase-name" style="color:var(--accent)">Fase 1 — Base</div>
+  <div class="phase-desc">Sett. 1–4 · Costruzione fondamenta aerobiche · Lungo: 7:15→6:45/km con negative split</div>
+</div>
+<div class="week-grid">
+
+  <!-- S1 -->
+  <div class="week-card normale">
+    <div class="week-header">
+      <div class="week-num">01<span>settimana</span></div>
+      <div class="week-date">28 mag – 1 giu</div>
+      <div class="week-badge badge-normale">Normale</div>
+    </div>
+    <div class="week-sessions">
+      <div class="session">
+        <div class="session-day">Giovedì · Qualità</div>
+        <div class="session-type">Corsa facile di rodaggio</div>
+        <div class="session-detail">Tutta a ritmo <strong>7:00/km</strong>. Partenza conservativa: ascolta il ginocchio, nessuna forzatura. Terreno pianeggiante.</div>
+        <div class="session-km">4 <span>km</span></div>
+      </div>
+      <div class="session">
+        <div class="session-day">Domenica · Lungo</div>
+        <div class="session-type">Lungo lento con negative split</div>
+        <div class="session-detail">Primi 4 km a <strong>7:15/km</strong>, ultimi 3 km a <strong>6:50/km</strong>. Mantieni la conversazione possibile per tutta la durata.</div>
+        <div class="session-km">7 <span>km</span></div>
+      </div>
+    </div>
+    <div class="week-total"><span class="week-total-label">Totale settimana</span><span class="week-total-val">11 <span>km</span></span></div>
+  </div>
+
+  <!-- S2 -->
+  <div class="week-card normale">
+    <div class="week-header">
+      <div class="week-num">02<span>settimana</span></div>
+      <div class="week-date">4 – 8 giu</div>
+      <div class="week-badge badge-normale">Normale</div>
+    </div>
+    <div class="week-sessions">
+      <div class="session">
+        <div class="session-day">Giovedì · Qualità</div>
+        <div class="session-type">Ripetute brevi</div>
+        <div class="session-detail">1 km riscaldamento <strong>7:00/km</strong>, poi <strong>3×1 km a 5:55/km</strong> con 90" camminata di recupero, 1 km defaticamento.</div>
+        <div class="session-km">5 <span>km</span></div>
+      </div>
+      <div class="session">
+        <div class="session-day">Domenica · Lungo</div>
+        <div class="session-type">Lungo lento con negative split · Ondulato</div>
+        <div class="session-detail">Primi 4 km a <strong>7:10/km</strong>, ultimi 4 km a <strong>6:45/km</strong>. Se il percorso è ondulato, non guardare il passo sulle salite: corri a sforzo costante.</div>
+        <div class="session-km">8 <span>km</span></div>
+      </div>
+    </div>
+    <div class="week-total"><span class="week-total-label">Totale settimana</span><span class="week-total-val">13 <span>km</span></span></div>
+  </div>
+
+  <!-- S3 -->
+  <div class="week-card normale">
+    <div class="week-header">
+      <div class="week-num">03<span>settimana</span></div>
+      <div class="week-date">11 – 15 giu</div>
+      <div class="week-badge badge-normale">Normale</div>
+    </div>
+    <div class="week-sessions">
+      <div class="session">
+        <div class="session-day">Giovedì · Qualità</div>
+        <div class="session-type">Ripetute brevi</div>
+        <div class="session-detail">2 km riscaldamento, poi <strong>3×1 km a 5:50/km</strong> con 90" camminata di recupero tra ognuno, 1 km defaticamento.</div>
+        <div class="session-km">6 <span>km</span></div>
+      </div>
+      <div class="session">
+        <div class="session-day">Domenica · Lungo</div>
+        <div class="session-type">Lungo lento con negative split</div>
+        <div class="session-detail">Primi 6 km a <strong>7:10/km</strong>, ultimi 6 km a <strong>6:40/km</strong>.</div>
+        <div class="session-km">12 <span>km</span></div>
+      </div>
+    </div>
+    <div class="week-total"><span class="week-total-label">Totale settimana</span><span class="week-total-val">18 <span>km</span></span></div>
+  </div>
+
+  <!-- S4 SCARICO -->
+  <div class="week-card scarico">
+    <div class="week-header">
+      <div class="week-num">04<span>settimana</span></div>
+      <div class="week-date">18 – 22 giu</div>
+      <div class="week-badge badge-scarico">Scarico</div>
+    </div>
+    <div class="week-sessions">
+      <div class="session">
+        <div class="session-day">Giovedì · Recupero</div>
+        <div class="session-type">Corsa facile</div>
+        <div class="session-detail">Tutto a <strong>7:00/km</strong> senza forzare. Settimana di recupero: lascia che muscoli e tendini assorbano il lavoro fatto.</div>
+        <div class="session-km">5 <span>km</span></div>
+      </div>
+      <div class="session">
+        <div class="session-day">Domenica · Lungo ridotto</div>
+        <div class="session-type">Lungo corto con negative split</div>
+        <div class="session-detail">Primi 5 km a <strong>7:15/km</strong>, ultimi 5 km a <strong>6:50/km</strong>. Nessuna pressione.</div>
+        <div class="session-km">10 <span>km</span></div>
+      </div>
+    </div>
+    <div class="week-total"><span class="week-total-label">Totale settimana</span><span class="week-total-val">15 <span>km</span></span></div>
+  </div>
+
+</div>
+
+<!-- FASE 2: COSTRUZIONE -->
+<div class="phase-header">
+  <div class="phase-name" style="color:var(--accent2)">Fase 2 — Costruzione</div>
+  <div class="phase-desc">Sett. 5–8 · Aumento volume e intensità · Lungo: 7:00→6:30/km con negative split</div>
+</div>
+<div class="week-grid">
+
+  <!-- S5 -->
+  <div class="week-card normale">
+    <div class="week-header">
+      <div class="week-num">05<span>settimana</span></div>
+      <div class="week-date">25 giu – 29 giu</div>
+      <div class="week-badge badge-normale">Normale</div>
+    </div>
+    <div class="week-sessions">
+      <div class="session">
+        <div class="session-day">Giovedì · Qualità</div>
+        <div class="session-type">🏔 Salite — sessione dedicata</div>
+        <div class="session-detail">2 km riscaldamento pianeggiante, poi <strong>6–8 ripetute su salita di 80–100m</strong> a sforzo massimo (non guardare il passo), discesa trotterellando come recupero. 1 km defaticamento. Ottimo per forza e ginocchio in discesa controllata.</div>
+        <div class="session-km">6–7 <span>km</span></div>
+      </div>
+      <div class="session">
+        <div class="session-day">Domenica · Lungo</div>
+        <div class="session-type">Lungo con negative split</div>
+        <div class="session-detail">Primi 7 km a <strong>7:00/km</strong>, ultimi 6 km a <strong>6:30/km</strong>.</div>
+        <div class="session-km">13 <span>km</span></div>
+      </div>
+    </div>
+    <div class="week-total"><span class="week-total-label">Totale settimana</span><span class="week-total-val">~20 <span>km</span></span></div>
+  </div>
+
+  <!-- S6 -->
+  <div class="week-card normale">
+    <div class="week-header">
+      <div class="week-num">06<span>settimana</span></div>
+      <div class="week-date">2 – 6 lug</div>
+      <div class="week-badge badge-normale">Normale</div>
+    </div>
+    <div class="week-sessions">
+      <div class="session">
+        <div class="session-day">Giovedì · Qualità</div>
+        <div class="session-type">Ripetute medie</div>
+        <div class="session-detail">2 km riscaldamento, <strong>4×1 km a 5:45/km</strong> con 90" recupero camminata, 1 km defaticamento.</div>
+        <div class="session-km">7 <span>km</span></div>
+      </div>
+      <div class="session">
+        <div class="session-day">Domenica · Lungo</div>
+        <div class="session-type">Lungo con negative split</div>
+        <div class="session-detail">Primi 7 km a <strong>6:55/km</strong>, ultimi 7 km a <strong>6:25/km</strong>.</div>
+        <div class="session-km">14 <span>km</span></div>
+      </div>
+    </div>
+    <div class="week-total"><span class="week-total-label">Totale settimana</span><span class="week-total-val">21 <span>km</span></span></div>
+  </div>
+
+  <!-- S7 -->
+  <div class="week-card normale">
+    <div class="week-header">
+      <div class="week-num">07<span>settimana</span></div>
+      <div class="week-date">9 – 13 lug</div>
+      <div class="week-badge badge-normale">Normale</div>
+    </div>
+    <div class="week-sessions">
+      <div class="session">
+        <div class="session-day">Giovedì · Qualità</div>
+        <div class="session-type">Progressivo</div>
+        <div class="session-detail">2 km riscaldamento, 4 km in progressione, ultimi 2 km a <strong>5:55/km</strong>, 1 km defaticamento.</div>
+        <div class="session-km">8 <span>km</span></div>
+      </div>
+      <div class="session">
+        <div class="session-day">Domenica · Lungo</div>
+        <div class="session-type">Lungo con negative split</div>
+        <div class="session-detail">Primi 8 km a <strong>6:50/km</strong>, ultimi 7 km a <strong>6:20/km</strong>.</div>
+        <div class="session-km">15 <span>km</span></div>
+      </div>
+    </div>
+    <div class="week-total"><span class="week-total-label">Totale settimana</span><span class="week-total-val">23 <span>km</span></span></div>
+  </div>
+
+  <!-- S8 SCARICO -->
+  <div class="week-card scarico">
+    <div class="week-header">
+      <div class="week-num">08<span>settimana</span></div>
+      <div class="week-date">16 – 20 lug</div>
+      <div class="week-badge badge-scarico">Scarico</div>
+    </div>
+    <div class="week-sessions">
+      <div class="session">
+        <div class="session-day">Giovedì · Recupero</div>
+        <div class="session-type">Corsa facile</div>
+        <div class="session-detail">6 km a <strong>7:00/km</strong>. Caldo estivo: se supera 28°C, riduci a 5 km o corri la mattina presto.</div>
+        <div class="session-km">6 <span>km</span></div>
+      </div>
+      <div class="session">
+        <div class="session-day">Domenica · Lungo ridotto</div>
+        <div class="session-type">Lungo corto con negative split</div>
+        <div class="session-detail">Primi 6 km a <strong>7:00/km</strong>, ultimi 6 km a <strong>6:30/km</strong>.</div>
+        <div class="session-km">12 <span>km</span></div>
+      </div>
+    </div>
+    <div class="week-total"><span class="week-total-label">Totale settimana</span><span class="week-total-val">18 <span>km</span></span></div>
+  </div>
+
+</div>
+
+<!-- FASE 3: SVILUPPO -->
+<div class="phase-header">
+  <div class="phase-name" style="color:#f0d060">Fase 3 — Sviluppo</div>
+  <div class="phase-desc">Sett. 9–12 · Consolidamento resistenza · Lungo: 6:45→6:15/km con negative split</div>
+</div>
+<div class="week-grid">
+
+  <!-- S9 -->
+  <div class="week-card normale">
+    <div class="week-header">
+      <div class="week-num">09<span>settimana</span></div>
+      <div class="week-date">23 – 27 lug</div>
+      <div class="week-badge badge-normale">Normale</div>
+    </div>
+    <div class="week-sessions">
+      <div class="session">
+        <div class="session-day">Giovedì · Qualità</div>
+        <div class="session-type">Ripetute medie</div>
+        <div class="session-detail">2 km riscaldamento, <strong>4×1 km a 5:40/km</strong> con 90" recupero, 2 km defaticamento.</div>
+        <div class="session-km">8 <span>km</span></div>
+      </div>
+      <div class="session">
+        <div class="session-day">Domenica · Lungo</div>
+        <div class="session-type">Lungo con negative split</div>
+        <div class="session-detail">Primi 8 km a <strong>6:45/km</strong>, ultimi 8 km a <strong>6:15/km</strong>.</div>
+        <div class="session-km">16 <span>km</span></div>
+      </div>
+    </div>
+    <div class="week-total"><span class="week-total-label">Totale settimana</span><span class="week-total-val">24 <span>km</span></span></div>
+  </div>
+
+  <!-- S10 -->
+  <div class="week-card normale">
+    <div class="week-header">
+      <div class="week-num">10<span>settimana</span></div>
+      <div class="week-date">30 lug – 3 ago</div>
+      <div class="week-badge badge-normale">Normale</div>
+    </div>
+    <div class="week-sessions">
+      <div class="session">
+        <div class="session-day">Giovedì · Qualità</div>
+        <div class="session-type">⏱ Prova a cronometro — 6 km</div>
+        <div class="session-detail">2 km riscaldamento, poi <strong>6 km al massimo sforzo sostenibile</strong> (non sprint — ritmo gara o meglio), 1 km defaticamento. Annota il tempo: è il tuo indicatore di progresso a metà piano. Target ideale: sotto 34 min.</div>
+        <div class="session-km">9 <span>km</span></div>
+      </div>
+      <div class="session">
+        <div class="session-day">Domenica · Lungo</div>
+        <div class="session-type">Lungo con negative split</div>
+        <div class="session-detail">Primi 9 km a <strong>6:45/km</strong>, ultimi 8 km a <strong>6:10/km</strong>.</div>
+        <div class="session-km">17 <span>km</span></div>
+      </div>
+    </div>
+    <div class="week-total"><span class="week-total-label">Totale settimana</span><span class="week-total-val">26 <span>km</span></span></div>
+  </div>
+
+  <!-- S11 -->
+  <div class="week-card normale">
+    <div class="week-header">
+      <div class="week-num">11<span>settimana</span></div>
+      <div class="week-date">6 – 10 ago</div>
+      <div class="week-badge badge-normale">Normale</div>
+    </div>
+    <div class="week-sessions">
+      <div class="session">
+        <div class="session-day">Giovedì · Qualità</div>
+        <div class="session-type">Ripetute lunghe</div>
+        <div class="session-detail">2 km riscaldamento, <strong>3×2 km a 5:45/km</strong> con 2' recupero camminata, 2 km defaticamento.</div>
+        <div class="session-km">8 <span>km</span></div>
+      </div>
+      <div class="session">
+        <div class="session-day">Domenica · Lungo</div>
+        <div class="session-type">Lungo con negative split</div>
+        <div class="session-detail">Primi 9 km a <strong>6:40/km</strong>, ultimi 9 km a <strong>6:10/km</strong>.</div>
+        <div class="session-km">18 <span>km</span></div>
+      </div>
+    </div>
+    <div class="week-total"><span class="week-total-label">Totale settimana</span><span class="week-total-val">26 <span>km</span></span></div>
+  </div>
+
+  <!-- S12 SCARICO -->
+  <div class="week-card scarico">
+    <div class="week-header">
+      <div class="week-num">12<span>settimana</span></div>
+      <div class="week-date">13 – 17 ago</div>
+      <div class="week-badge badge-scarico">Scarico</div>
+    </div>
+    <div class="week-sessions">
+      <div class="session">
+        <div class="session-day">Giovedì · Recupero</div>
+        <div class="session-type">Corsa facile</div>
+        <div class="session-detail">6 km a <strong>7:00/km</strong>. Ferragosto: priorità al recupero. Idratazione importante.</div>
+        <div class="session-km">6 <span>km</span></div>
+      </div>
+      <div class="session">
+        <div class="session-day">Domenica · Lungo ridotto</div>
+        <div class="session-type">Lungo corto con negative split</div>
+        <div class="session-detail">Primi 7 km a <strong>6:50/km</strong>, ultimi 6 km a <strong>6:20/km</strong>.</div>
+        <div class="session-km">13 <span>km</span></div>
+      </div>
+    </div>
+    <div class="week-total"><span class="week-total-label">Totale settimana</span><span class="week-total-val">19 <span>km</span></span></div>
+  </div>
+
+</div>
+
+<!-- FASE 4: SPECIFICO -->
+<div class="phase-header">
+  <div class="phase-name" style="color:var(--accent3)">Fase 4 — Specifico</div>
+  <div class="phase-desc">Sett. 13–15 · Lungo con finale a ritmo gara (5:41/km) · Massimo volume</div>
+</div>
+<div class="week-grid">
+
+  <!-- S13 -->
+  <div class="week-card normale">
+    <div class="week-header">
+      <div class="week-num">13<span>settimana</span></div>
+      <div class="week-date">20 – 24 ago</div>
+      <div class="week-badge badge-normale">Normale</div>
+    </div>
+    <div class="week-sessions">
+      <div class="session">
+        <div class="session-day">Giovedì · Qualità</div>
+        <div class="session-type">Ripetute specifiche</div>
+        <div class="session-detail">2 km riscaldamento, <strong>3×2 km a 5:40/km</strong> con 2' recupero, 3 km defaticamento.</div>
+        <div class="session-km">9 <span>km</span></div>
+      </div>
+      <div class="session">
+        <div class="session-day">Domenica · Lungo specifico</div>
+        <div class="session-type">Lungo con finale a ritmo gara</div>
+        <div class="session-detail">Primi 10 km a <strong>6:30/km</strong>, km 11–14 a <strong>6:00/km</strong>, ultimi 5 km a <strong>5:41/km</strong> (ritmo gara).</div>
+        <div class="session-km">19 <span>km</span></div>
+      </div>
+    </div>
+    <div class="week-total"><span class="week-total-label">Totale settimana</span><span class="week-total-val">28 <span>km</span></span></div>
+  </div>
+
+  <!-- S14 -->
+  <div class="week-card normale">
+    <div class="week-header">
+      <div class="week-num">14<span>settimana</span></div>
+      <div class="week-date">27 – 31 ago</div>
+      <div class="week-badge badge-normale">Normale</div>
+    </div>
+    <div class="week-sessions">
+      <div class="session">
+        <div class="session-day">Giovedì · Qualità</div>
+        <div class="session-type">Progressivo lungo</div>
+        <div class="session-detail">3 km riscaldamento, 5 km in progressione, ultimi 2 km a <strong>5:41/km</strong> (ritmo gara).</div>
+        <div class="session-km">10 <span>km</span></div>
+      </div>
+      <div class="session">
+        <div class="session-day">Domenica · Lungo specifico</div>
+        <div class="session-type">Lungo con finale a ritmo gara</div>
+        <div class="session-detail">Primi 10 km a <strong>6:30/km</strong>, km 11–15 a <strong>5:55/km</strong>, ultimi 5 km a <strong>5:41/km</strong>.</div>
+        <div class="session-km">20 <span>km</span></div>
+      </div>
+    </div>
+    <div class="week-total"><span class="week-total-label">Totale settimana</span><span class="week-total-val">30 <span>km</span></span></div>
+  </div>
+
+  <!-- S15 -->
+  <div class="week-card normale">
+    <div class="week-header">
+      <div class="week-num">15<span>settimana</span></div>
+      <div class="week-date">3 – 7 set</div>
+      <div class="week-badge badge-normale">Picco</div>
+    </div>
+    <div class="week-sessions">
+      <div class="session">
+        <div class="session-day">Giovedì · Qualità</div>
+        <div class="session-type">Ripetute lunghe specifiche</div>
+        <div class="session-detail">2 km riscaldamento, <strong>2×3 km a 5:42/km</strong> con 3' recupero, 4 km defaticamento.</div>
+        <div class="session-km">9 <span>km</span></div>
+      </div>
+      <div class="session">
+        <div class="session-day">Domenica · Lungo massimo</div>
+        <div class="session-type">Lungo con finale a ritmo gara</div>
+        <div class="session-detail">Primi 10 km a <strong>6:25/km</strong>, km 11–16 a <strong>5:55/km</strong>, ultimi 5 km a <strong>5:41/km</strong>. La corsa più lunga del piano.</div>
+        <div class="session-km">21 <span>km</span></div>
+      </div>
+    </div>
+    <div class="week-total"><span class="week-total-label">Totale settimana</span><span class="week-total-val">30 <span>km</span></span></div>
+  </div>
+
+</div>
+
+<!-- FASE 5: TAPERING -->
+<div class="phase-header">
+  <div class="phase-name" style="color:var(--tapering)">Fase 5 — Tapering</div>
+  <div class="phase-desc">Sett. 16–18 · Riduzione volume, mantenimento ritmo · Prepara le gambe alla gara</div>
+</div>
+<div class="week-grid">
+
+  <!-- S16 SCARICO -->
+  <div class="week-card scarico">
+    <div class="week-header">
+      <div class="week-num">16<span>settimana</span></div>
+      <div class="week-date">10 – 14 set</div>
+      <div class="week-badge badge-scarico">Scarico</div>
+    </div>
+    <div class="week-sessions">
+      <div class="session">
+        <div class="session-day">Giovedì · Recupero attivo</div>
+        <div class="session-type">Corsa facile</div>
+        <div class="session-detail">7 km a <strong>6:50–7:00/km</strong>. Il corpo ha bisogno di assorbire il picco. Non forzare assolutamente.</div>
+        <div class="session-km">7 <span>km</span></div>
+      </div>
+      <div class="session">
+        <div class="session-day">Domenica · Lungo ridotto</div>
+        <div class="session-type">Lungo tranquillo con negative split</div>
+        <div class="session-detail">Primi 8 km a <strong>7:00/km</strong>, ultimi 7 km a <strong>6:30/km</strong>. Ultimi 2 km a <strong>5:45/km</strong> per mantenere sensazioni.</div>
+        <div class="session-km">15 <span>km</span></div>
+      </div>
+    </div>
+    <div class="week-total"><span class="week-total-label">Totale settimana</span><span class="week-total-val">22 <span>km</span></span></div>
+  </div>
+
+  <!-- S17 TAPERING -->
+  <div class="week-card tapering">
+    <div class="week-header">
+      <div class="week-num">17<span>settimana</span></div>
+      <div class="week-date">17 – 21 set</div>
+      <div class="week-badge badge-tapering">Tapering</div>
+    </div>
+    <div class="week-sessions">
+      <div class="session">
+        <div class="session-day">Giovedì · Qualità leggera</div>
+        <div class="session-type">Progressivo moderato</div>
+        <div class="session-detail">3 km riscaldamento, 4 km progressione, ultimi 1 km a <strong>5:41/km</strong>. Solo per mantenere sensazioni di ritmo.</div>
+        <div class="session-km">8 <span>km</span></div>
+      </div>
+      <div class="session">
+        <div class="session-day">Domenica · Lungo ridotto</div>
+        <div class="session-type">Lungo tranquillo</div>
+        <div class="session-detail">Primi 9 km a <strong>6:50/km</strong>, ultimi 9 km a <strong>6:20/km</strong>. Nessun affaticamento, solo mantenimento.</div>
+        <div class="session-km">18 <span>km</span></div>
+      </div>
+    </div>
+    <div class="week-total"><span class="week-total-label">Totale settimana</span><span class="week-total-val">26 <span>km</span></span></div>
+  </div>
+
+  <!-- S18 TAPERING FINALE -->
+  <div class="week-card tapering">
+    <div class="week-header">
+      <div class="week-num">18<span>settimana</span></div>
+      <div class="week-date">24 – 28 set</div>
+      <div class="week-badge badge-tapering">Pre-Gara</div>
+    </div>
+    <div class="week-sessions">
+      <div class="session">
+        <div class="session-day">Giovedì · Scarico finale</div>
+        <div class="session-type">Corsa sciolta</div>
+        <div class="session-detail">6 km a <strong>6:50/km</strong> con 4×100m accelerazioni a ritmo gara nel mezzo. Solo per tenere le gambe sveglie.</div>
+        <div class="session-km">6 <span>km</span></div>
+      </div>
+      <div class="session">
+        <div class="session-day">Domenica · Ultima uscita</div>
+        <div class="session-type">Corsa breve con assaggio ritmo</div>
+        <div class="session-detail">Primi 6 km a <strong>7:00/km</strong>, km 7–10 a <strong>6:30/km</strong>, ultimi 2 km a <strong>5:41/km</strong>. Fine settimana di riposo totale prima della gara.</div>
+        <div class="session-km">12 <span>km</span></div>
+      </div>
+    </div>
+    <div class="week-total"><span class="week-total-label">Totale settimana</span><span class="week-total-val">18 <span>km</span></span></div>
+  </div>
+
+</div>
+
+<!-- SETTIMANA 19: TAPERING FINALE -->
+<div class="phase-header">
+  <div class="phase-name" style="color:var(--tapering)">Settimana 19 — Tapering finale</div>
+  <div class="phase-desc">5 – 11 ott · Volume minimo · Gambe fresche per la gara domenica 11</div>
+</div>
+<div class="week-grid">
+  <div class="week-card tapering">
+    <div class="week-header">
+      <div class="week-num">19<span>settimana</span></div>
+      <div class="week-date">5 – 9 ott</div>
+      <div class="week-badge badge-tapering">Tapering</div>
+    </div>
+    <div class="week-sessions">
+      <div class="session">
+        <div class="session-day">Giovedì · Scarico finale</div>
+        <div class="session-type">Corsetta sciolta + strides</div>
+        <div class="session-detail">4 km a <strong>7:00/km</strong> + 4×100m a ritmo gara con recupero camminata. Solo per tenere le gambe reattive. Nessuno sforzo.</div>
+        <div class="session-km">4–5 <span>km</span></div>
+      </div>
+      <div class="session">
+        <div class="session-day">Sabato · Ultimo richiamo</div>
+        <div class="session-type">Corsetta leggera</div>
+        <div class="session-detail">3 km facilissimi a <strong>7:15/km</strong>. Solo per non sentirsi fermi. Domenica riposo totale — poi la gara martedì 11.</div>
+        <div class="session-km">3 <span>km</span></div>
+      </div>
+    </div>
+    <div class="week-total"><span class="week-total-label">Totale settimana (pre-gara)</span><span class="week-total-val">~8 <span>km</span></span></div>
+  </div>
+</div>
+
+<!-- SETTIMANA 20: GARA -->
+<div class="phase-header">
+  <div class="phase-name" style="color:var(--gara)">Settimana 20 — Gara</div>
+  <div class="phase-desc">11 Ottobre 2026 · Mezza Maratona di Re → Venaria · Obiettivo: 2:00:00</div>
+</div>
+<div class="week-grid">
+  <div class="week-card gara">
+    <div class="week-header">
+      <div class="week-num">20<span>settimana</span></div>
+      <div class="week-date">11 ottobre 2026</div>
+      <div class="week-badge badge-gara">GARA DAY</div>
+    </div>
+    <div class="gara-session" style="grid-column: 1/-1; padding: 32px 24px; text-align:center;">
+      <div class="session-day" style="color:var(--gara); letter-spacing:4px; margin-bottom:12px;">DOMENICA 11 OTTOBRE · RE → VENARIA</div>
+      <div class="gara-title">MEZZA MARATONA</div>
+      <div style="font-family:'Bebas Neue'; font-size:28px; color:var(--text); margin: 8px 0;">21,1 km · Obiettivo 2:00:00</div>
+      <div class="gara-sub" style="margin-top:12px; line-height:2;">
+        Strategia: parti a <strong style="color:var(--accent)">5:55/km</strong> nei primi 5 km · accelera a <strong style="color:var(--accent)">5:45/km</strong> fino al km 15 · spinta finale <strong style="color:var(--accent)">5:30/km</strong>
+      </div>
+    </div>
+    <div class="week-total"><span class="week-total-label">Distanza gara</span><span class="week-total-val">21.1 <span>km</span></span></div>
+  </div>
+</div>
+
+
+</div><!-- end tab-piano -->
+
+<!-- ═══════════════════════════════════════════════════════ TAB: NOTE & RITMI -->
+<div id="tab-ritmi" class="tab-panel panel-bottom">
+<div class="notes-wrap">
+  <div class="notes-grid">
+    <div class="note-card">
+      <h4>Ginocchio · Post-artroscopia</h4>
+      <ul>
+        <li>Se senti fastidio (non solo affaticamento) dopo una sessione, sostituisci la corsa successiva con 45' di bici o nuoto</li>
+        <li>Mai aumentare volume per due settimane consecutive se il ginocchio ha dato segnali</li>
+        <li>Riscaldamento di almeno 5' di camminata veloce prima di ogni corsa</li>
+        <li>Ghiaccio sul ginocchio 10–15 min dopo le sessioni di qualità o i lunghi sopra i 15 km</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h4>Ritmi di riferimento</h4>
+      <ul>
+        <li><strong style="color:var(--accent)">Ritmo gara:</strong> 5:41/km (obiettivo 2:00:00)</li>
+        <li><strong style="color:var(--accent2)">Ritmo lento base:</strong> 7:00–7:15/km</li>
+        <li><strong style="color:var(--accent2)">Ritmo lento sviluppo:</strong> 6:30–6:45/km</li>
+        <li><strong style="color:var(--accent)">Ripetute:</strong> 5:40–5:50/km</li>
+        <li><strong style="color:var(--scarico)">Defaticamento:</strong> 7:00–7:30/km</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h4>Strategia di gara</h4>
+      <ul>
+        <li>Km 1–5: 5:55/km (parti conservativo, sfrutta l'adrenalina con cautela)</li>
+        <li>Km 6–15: 5:45/km (ritmo controllato, gestisci le salite)</li>
+        <li>Km 16–21: 5:30/km (spinta finale con quello che rimane)</li>
+        <li>Non guardare il crono nei primi 5 km: corri a sensazione</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h4>Estate · Caldo</h4>
+      <ul>
+        <li>Luglio–agosto: corri mattina presto (prima delle 8) o sera (dopo le 20)</li>
+        <li>Se temperatura > 28°C, riduci ritmo di 15–20 sec/km</li>
+        <li>Idratazione: 500ml nelle 2h prima, acqua ogni 5 km durante il lungo</li>
+        <li>Non fare sessioni di qualità nelle giornate più calde</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h4>Negative Split · Come farlo</h4>
+      <ul>
+        <li>Parti sempre più lento di quanto pensi necessario</li>
+        <li>La divisione prima/seconda metà è indicativa: ascolta il corpo</li>
+        <li>Il cambio ritmo deve essere graduale, non uno scatto</li>
+        <li>Se stai soffrendo a metà lungo, rallenta — non accelerare per recuperare</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h4>Settimana pre-gara</h4>
+      <ul>
+        <li>Lunedì–mercoledì: riposo o camminata leggera</li>
+        <li>Giovedì: corsa sciolta con accelerazioni (come da piano)</li>
+        <li>Venerdì–sabato: riposo totale</li>
+        <li>Domenica gara: colazione 3h prima, niente di nuovo</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-title">Note & Consigli</div>
+  <div class="notes-grid">
+    <div class="note-card">
+      <h4>Ginocchio · Post-artroscopia</h4>
+      <ul>
+        <li>Se senti fastidio (non solo affaticamento) dopo una sessione, sostituisci la corsa successiva con 45' di bici o nuoto</li>
+        <li>Mai aumentare volume per due settimane consecutive se il ginocchio ha dato segnali</li>
+        <li>Riscaldamento di almeno 5' di camminata veloce prima di ogni corsa</li>
+        <li>Ghiaccio sul ginocchio 10–15 min dopo le sessioni di qualità o i lunghi sopra 15 km</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h4>Ritmi di riferimento</h4>
+      <ul>
+        <li><strong style="color:var(--accent)">Ritmo gara:</strong> 5:41/km (obiettivo 2:00:00)</li>
+        <li><strong style="color:var(--accent2)">Ritmo lento base:</strong> 7:00–7:15/km</li>
+        <li><strong style="color:var(--accent2)">Ritmo lento sviluppo:</strong> 6:30–6:45/km</li>
+        <li><strong style="color:var(--accent)">Ripetute:</strong> 5:40–5:50/km</li>
+        <li><strong style="color:var(--scarico)">Defaticamento:</strong> 7:00–7:30/km</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h4>Strategia di gara · Re→Venaria</h4>
+      <ul>
+        <li>Km 1–5: 5:55/km (parti conservativo, sfrutta l'adrenalina con cautela)</li>
+        <li>Km 6–15: 5:45/km (ritmo controllato, gestisci le salite)</li>
+        <li>Km 16–21: 5:30/km (spinta finale con quello che rimane)</li>
+        <li>Non guardare il crono nei primi 5 km: corri a sensazione</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h4>Estate · Caldo</h4>
+      <ul>
+        <li>Luglio–agosto: corri mattina presto (prima delle 8) o sera (dopo le 20)</li>
+        <li>Se temperatura > 28°C, riduci ritmo di 15–20 sec/km</li>
+        <li>Idratazione: 500ml nelle 2h prima, acqua ogni 5 km durante il lungo</li>
+        <li>Non fare sessioni di qualità nelle giornate più calde</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h4>Negative Split · Come farlo</h4>
+      <ul>
+        <li>Parti sempre più lento di quanto pensi necessario</li>
+        <li>La divisione prima/seconda metà è indicativa: ascolta il corpo</li>
+        <li>Il cambio ritmo deve essere graduale, non uno scatto</li>
+        <li>Se stai soffrendo a metà lungo, rallenta — non accelerare per recuperare</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h4>Settimana pre-gara</h4>
+      <ul>
+        <li>Lunedì–mercoledì: riposo o camminata leggera</li>
+        <li>Giovedì: corsa sciolta con accelerazioni (come da piano)</li>
+        <li>Venerdì–sabato: riposo totale</li>
+        <li>Domenica 11 ott: colazione 3h prima, niente di nuovo</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</div><!-- end tab-ritmi -->
+
+<!-- ═══════════════════════════════════════════════════════ TAB: STRETCHING -->
+<div id="tab-stretching" class="tab-panel panel-bottom">
+<div class="stretch-wrap">
+  <div class="section-title">Stretching · Routine completa</div>
+  <p style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:20px;padding:8px 12px;background:rgba(240,176,64,0.08);border-radius:6px;border-left:2px solid var(--scarico);">
+    ⚠️ Mai stretching statico PRIMA della corsa — solo riscaldamento dinamico. Stretching statico solo DOPO.
+  </p>
+  <div class="notes-grid">
+    <div class="note-card" style="border-top:2px solid var(--accent2);">
+      <h4 style="color:var(--accent2)">Prima della corsa · Riscaldamento dinamico (5 min)</h4>
+      <ul>
+        <li><strong style="color:var(--text)">Camminata veloce</strong> — 2 min. Attiva la circolazione, scalda l'articolazione del ginocchio</li>
+        <li><strong style="color:var(--text)">Ginocchia alte</strong> — 20 passi. Porta ogni ginocchio all'altezza del bacino alternando</li>
+        <li><strong style="color:var(--text)">Calci ai glutei</strong> — 20 passi. Porta il tallone verso il gluteo, attiva i flessori del ginocchio</li>
+        <li><strong style="color:var(--text)">Circonduzioni caviglie</strong> — 10 rotazioni per lato. Fondamentale per il terreno ondulato</li>
+        <li><strong style="color:var(--text)">Affondi dinamici</strong> — 8 per gamba. Passo lungo in avanti, ginocchio a 90°, ritorna. Non tenere la posizione</li>
+        <li><strong style="color:var(--text)">Leg swing laterali</strong> — 10 per gamba. Tieniti a un muro, dondola la gamba lateralmente per aprire l'anca</li>
+      </ul>
+    </div>
+    <div class="note-card" style="border-top:2px solid var(--accent);">
+      <h4 style="color:var(--accent)">Dopo la corsa · Stretching statico (10–12 min)</h4>
+      <ul>
+        <li><strong style="color:var(--text)">Quadricipite</strong> — 30 sec/gamba. In piedi, tallone al gluteo. <em style="color:var(--muted)">Non forzare oltre la tensione — critico per il menisco</em></li>
+        <li><strong style="color:var(--text)">IT band</strong> — 30 sec/lato. Incrocia la gamba destra davanti alla sinistra, piega il busto verso destra. <em style="color:var(--muted)">Previene il dolore laterale al ginocchio</em></li>
+        <li><strong style="color:var(--text)">Polpaccio</strong> — 30 sec/gamba. A muro, gamba posteriore dritta con tallone a terra</li>
+        <li><strong style="color:var(--text)">Flessore dell'anca</strong> — 30 sec/lato. Affondo basso con ginocchio a terra, spingi il bacino in avanti</li>
+        <li><strong style="color:var(--text)">Hamstring</strong> — 30 sec/gamba. Seduto, gamba tesa, mani verso il piede, schiena dritta</li>
+        <li><strong style="color:var(--text)">Piriforme</strong> — 30 sec/lato. Sdraiato, caviglia destra sul ginocchio sinistro, abbraccia la coscia verso il petto</li>
+        <li><strong style="color:var(--text)">Schiena bassa</strong> — 30 sec. Sdraiato, entrambe le ginocchia al petto, dondola leggermente</li>
+      </ul>
+    </div>
+    <div class="note-card" style="border-top:2px solid var(--scarico);">
+      <h4 style="color:var(--scarico)">Dopo i lunghi domenicali · Extra (5 min aggiuntivi)</h4>
+      <ul>
+        <li><strong style="color:var(--text)">Soleo</strong> — 30 sec/gamba. Come il polpaccio ma con ginocchio posteriore leggermente piegato</li>
+        <li><strong style="color:var(--text)">Fascia plantare</strong> — 1 min/piede. Seduto, porta il piede sulla coscia, piega le dita verso la tibia con la mano</li>
+        <li><strong style="color:var(--text)">Spalancata anca</strong> — 45 sec/lato. Affondo basso profondo, gomito verso il pavimento accanto al piede anteriore</li>
+        <li><strong style="color:var(--text)">Rotazione toracica</strong> — 10/lato. In quadrupedia, porta un gomito verso il soffitto. Rilassa la parte alta della schiena</li>
+        <li><strong style="color:var(--text)">Posizione del bambino</strong> — 1 min. Ginocchia a terra, siediti sui talloni, allunga le braccia in avanti. Decomprime la colonna</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</div><!-- end tab-stretching -->
+
+<!-- ═══════════════════════════════════════════════════════ TAB: ALIMENTAZIONE -->
+<div id="tab-alimentazione" class="tab-panel panel-bottom">
+<div class="stretch-wrap">
+  <div class="section-title">Alimentazione</div>
+  <p style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:20px;">Nessuna dieta speciale richiesta — solo tempistica e scelte intelligenti.</p>
+  <div class="notes-grid">
+    <div class="note-card" style="border-top:2px solid var(--accent);">
+      <h4 style="color:var(--accent)">Prima · Giovedì (sessione qualità)</h4>
+      <ul>
+        <li><strong style="color:var(--text)">3–4 ore prima:</strong> pasto normale con carboidrati (pasta, riso, pane) + proteine leggere</li>
+        <li><strong style="color:var(--text)">1–2 ore prima:</strong> spuntino leggero: banana + mandorle, o pane integrale con miele</li>
+        <li><strong style="color:var(--text)">30–45 min prima:</strong> solo acqua (300–400 ml). Evita cibi pesanti, fibre in eccesso, latticini interi</li>
+      </ul>
+    </div>
+    <div class="note-card" style="border-top:2px solid var(--tapering);">
+      <h4 style="color:var(--tapering)">Prima · Lungo domenicale (16+ km)</h4>
+      <ul>
+        <li><strong style="color:var(--text)">Sera prima:</strong> pasta o risotto con porzione generosa. Evita sughi pesanti</li>
+        <li><strong style="color:var(--text)">Mattina (2–3h prima):</strong> porridge d'avena con banana e miele, o pane + marmellata + yogurt greco</li>
+        <li><strong style="color:var(--text)">Durante il lungo (&gt;75 min):</strong> gel energetico o banana a metà (km 8–10). Prova in allenamento prima della gara</li>
+        <li><strong style="color:var(--text)">Acqua:</strong> 500 ml nell'ora precedente, sorsi ogni 15–20 min. In estate +30%</li>
+      </ul>
+    </div>
+    <div class="note-card" style="border-top:2px solid var(--accent2);">
+      <h4 style="color:var(--accent2)">Dopo ogni corsa · Finestra di recupero (entro 45 min)</h4>
+      <ul>
+        <li><strong style="color:var(--text)">Regola:</strong> carboidrati + proteine nel rapporto 3:1</li>
+        <li><strong style="color:var(--text)">Spuntino rapido:</strong> yogurt greco con banana e miele, o latte + cereali, o frullato con frutta</li>
+        <li><strong style="color:var(--text)">Pasto (1–2h dopo):</strong> proteine (pollo, pesce, uova, legumi) + carboidrati + verdure</li>
+        <li><strong style="color:var(--text)">Idratazione:</strong> 500 ml subito dopo. Urina giallo chiaro entro 2h</li>
+        <li><strong style="color:var(--text)">Dopo i lunghi:</strong> aggiungi una fonte di sodio (brodo, pretzel salati)</li>
+      </ul>
+    </div>
+    <div class="note-card" style="border-top:2px solid var(--gara);">
+      <h4 style="color:var(--gara)">Giorno di gara · 11 Ottobre</h4>
+      <ul>
+        <li><strong style="color:var(--text)">Sera prima:</strong> pasta in bianco o riso + proteina leggera. Niente di nuovo</li>
+        <li><strong style="color:var(--text)">Colazione (3h prima):</strong> porridge d'avena con banana + miele + caffè se abituato. Solo cibi già testati</li>
+        <li><strong style="color:var(--text)">90 min prima:</strong> 400 ml acqua. Opzionale: mezzo gel o mezza banana</li>
+        <li><strong style="color:var(--text)">Durante:</strong> gel al km 7–8 e 14–15 (se testati). Acqua a ogni ristoro. Non aspettare di avere sete</li>
+        <li><strong style="color:var(--text)">Dopo il traguardo:</strong> acqua + banana subito. Poi pasto completo entro 2h 🎉</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</div><!-- end tab-alimentazione -->
+
+<script>
+// ── TAB SWITCHING ──────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ── PIANO DATA ─────────────────────────────────────────────────────────────
+const PLAN = [
+  { w:1,  date:'28 mag – 1 giu',   sessions:[{id:'1a',day:'Giovedì',name:'Corsa facile rodaggio',km:4},{id:'1b',day:'Domenica',name:'Lungo lento – negative split',km:7}] },
+  { w:2,  date:'4 – 8 giu',        sessions:[{id:'2a',day:'Giovedì',name:'Ripetute 3×1km a 5:55',km:5},{id:'2b',day:'Domenica',name:'Lungo – negative split ondulato',km:8}] },
+  { w:3,  date:'8 – 14 giu',       sessions:[{id:'3a',day:'Giovedì',name:'Ripetute 3×1km a 5:50',km:6},{id:'3b',day:'Domenica',name:'Lungo lento – negative split',km:9}] },
+  { w:4,  date:'15 – 21 giu',      sessions:[{id:'4a',day:'Giovedì',name:'Scarico – corsa facile',km:5},{id:'4b',day:'Domenica',name:'Lungo corto – negative split',km:10}] },
+  { w:5,  date:'22 – 28 giu',      sessions:[{id:'5a',day:'Giovedì',name:'🏔 Salite – 6-8 ripetute',km:7},{id:'5b',day:'Domenica',name:'Lungo – negative split',km:13}] },
+  { w:6,  date:'29 giu – 5 lug',   sessions:[{id:'6a',day:'Giovedì',name:'Ripetute 4×1km a 5:45',km:7},{id:'6b',day:'Domenica',name:'Lungo – negative split',km:14}] },
+  { w:7,  date:'6 – 12 lug',       sessions:[{id:'7a',day:'Giovedì',name:'Progressivo lungo',km:8},{id:'7b',day:'Domenica',name:'Lungo ondulato – negative split',km:15}] },
+  { w:8,  date:'13 – 19 lug',      sessions:[{id:'8a',day:'Giovedì',name:'Scarico – ripetute leggere',km:5.5},{id:'8b',day:'Domenica',name:'Lungo ridotto',km:7}] },
+  { w:9,  date:'20 – 26 lug',      sessions:[{id:'9a',day:'Giovedì',name:'Corto veloce',km:8},{id:'9b',day:'Domenica',name:'Lungo ondulato – negative split',km:12}] },
+  { w:10, date:'27 lug – 2 ago',   sessions:[{id:'10a',day:'Giovedì',name:'⏱ Prova cronometro 6km',km:9},{id:'10b',day:'Domenica',name:'Lungo – negative split',km:17}] },
+  { w:11, date:'3 – 9 ago',        sessions:[{id:'11a',day:'Giovedì',name:'Corsa facile',km:8},{id:'11b',day:'Domenica',name:'Lungo',km:14}] },
+  { w:12, date:'10 – 16 ago',      sessions:[{id:'12a',day:'Giovedì',name:'Corto veloce',km:8},{id:'12b',day:'Domenica',name:'Lungo ondulato',km:15}] },
+  { w:13, date:'17 – 23 ago',      sessions:[{id:'13a',day:'Giovedì',name:'Ripetute 3×2km a 5:40',km:9},{id:'13b',day:'Domenica',name:'Lungo specifico con finale a ritmo gara',km:19}] },
+  { w:14, date:'24 – 30 ago',      sessions:[{id:'14a',day:'Giovedì',name:'Progressivo con finale a ritmo gara',km:10},{id:'14b',day:'Domenica',name:'Lungo 20km con finale a ritmo gara',km:20}] },
+  { w:15, date:'31 ago – 6 set',   sessions:[{id:'15a',day:'Giovedì',name:'Ripetute 2×3km a 5:42',km:9},{id:'15b',day:'Domenica',name:'Lungo massimo 21km',km:21}] },
+  { w:16, date:'7 – 13 set',       sessions:[{id:'16a',day:'Giovedì',name:'Ripetute scarico',km:6.3},{id:'16b',day:'Domenica',name:'Lungo ridotto – negative split',km:16}] },
+  { w:17, date:'14 – 20 set',      sessions:[{id:'17a',day:'Giovedì',name:'Corto veloce',km:5.5},{id:'17b',day:'Domenica',name:'Lungo tranquillo',km:12}] },
+  { w:18, date:'21 – 27 set',      sessions:[{id:'18a',day:'Giovedì',name:'Corsetta sciolta + strides',km:6},{id:'18b',day:'Domenica',name:'Corsa breve con assaggio ritmo',km:12}] },
+  { w:19, date:'5 – 9 ott',        sessions:[{id:'19a',day:'Giovedì',name:'Tapering – strides',km:5},{id:'19b',day:'Sabato',name:'Corsetta leggera 3km',km:3}] },
+  { w:20, date:'11 ott',           sessions:[{id:'20a',day:'Domenica',name:'🏁 GARA – Mezza Maratona Re→Venaria',km:21.1,isGara:true}] },
+];
+
+const STORAGE_KEY = 'mezza_maratona_v2';
+
+function loadState() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; } }
+function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+let state = loadState();
+
+// ── TRACKER RENDER ─────────────────────────────────────────────────────────
+function renderTracker() {
+  const container = document.getElementById('tracker-weeks');
+  container.innerHTML = '';
+  PLAN.forEach(week => {
+    const doneCount = week.sessions.filter(s => state[s.id]?.done).length;
+    const total = week.sessions.length;
+    const allDone = doneCount === total;
+    const partDone = doneCount > 0 && !allDone;
+    const pillHtml = allDone
+      ? `<span class="tracker-pill done">✓ Completata</span>`
+      : partDone ? `<span class="tracker-pill partial">${doneCount}/${total}</span>`
+      : `<span class="tracker-pill">${total} sessioni</span>`;
+    const weekEl = document.createElement('div');
+    weekEl.className = 'tracker-week';
+    weekEl.innerHTML = `
+      <div class="tracker-week-header" onclick="toggleWeek(${week.w})">
+        <div class="tracker-week-num">W${week.w}</div>
+        <div class="tracker-week-info">
+          <div class="tracker-week-name">Settimana ${week.w}${week.w===20?' — 🏁 GARA':''}</div>
+          <div class="tracker-week-date">${week.date}</div>
+        </div>
+        <div class="tracker-week-pills">${pillHtml}</div>
+        <span class="tracker-arrow" id="arrow-${week.w}">▶</span>
+      </div>
+      <div class="tracker-week-sessions" id="sessions-${week.w}">
+        ${week.sessions.map(s => renderSession(s)).join('')}
+      </div>`;
+    container.appendChild(weekEl);
+  });
+  updateStats();
+}
+
+function renderSession(s) {
+  const d = state[s.id] || {};
+  return `
+    <div class="tracker-session-row" id="row-${s.id}">
+      <div class="tracker-session-top">
+        <div class="tracker-checkbox ${d.done?'checked':''}" id="cb-${s.id}" onclick="toggleDone('${s.id}')"></div>
+        <div class="tracker-session-label">
+          <div class="tracker-session-day-label">${s.day}</div>
+          <div class="tracker-session-name">${s.name}</div>
+        </div>
+      </div>
+      <div class="tracker-fields">
+        <div class="tracker-field"><label>Data</label><input type="date" id="f-date-${s.id}" value="${d.date||''}" onchange="autoSave('${s.id}')"></div>
+        <div class="tracker-field"><label>Distanza (km)</label><input type="number" step="0.1" id="f-km-${s.id}" value="${d.km||''}" placeholder="${s.km}" onchange="autoSave('${s.id}')"></div>
+        <div class="tracker-field"><label>Durata (mm:ss)</label><input type="text" id="f-dur-${s.id}" value="${d.dur||''}" placeholder="es. 48:30" onchange="autoSave('${s.id}')"></div>
+        <div class="tracker-field"><label>Ritmo medio (/km)</label><input type="text" id="f-pace-${s.id}" value="${d.pace||''}" placeholder="es. 6:12" onchange="autoSave('${s.id}')"></div>
+        <div class="tracker-field"><label>FC media (bpm)</label><input type="number" id="f-hr-${s.id}" value="${d.hr||''}" placeholder="es. 148" onchange="autoSave('${s.id}')"></div>
+        <div class="tracker-field"><label>Dislivello (m)</label><input type="number" id="f-elev-${s.id}" value="${d.elev||''}" placeholder="es. 85" onchange="autoSave('${s.id}')"></div>
+        <div class="tracker-field" style="grid-column:1/-1">
+          <label>Note / sensazioni</label>
+          <textarea id="f-note-${s.id}" onchange="autoSave('${s.id}')">${d.note||''}</textarea>
+          <div class="strava-hint">📱 Da Strava: distanza, durata, dislivello, ritmo medio, FC media</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;margin-top:8px;">
+        <button class="tracker-save-btn" onclick="manualSave('${s.id}')">Salva</button>
+        <span class="tracker-saved-badge" id="saved-${s.id}">✓ Salvato</span>
+      </div>
+    </div>`;
+}
+
+function toggleWeek(w) {
+  const el = document.getElementById(`sessions-${w}`);
+  const arrow = document.getElementById(`arrow-${w}`);
+  const isOpen = el.classList.contains('open');
+  el.classList.toggle('open', !isOpen);
+  arrow.textContent = isOpen ? '▶' : '▼';
+}
+
+function toggleDone(id) {
+  if (!state[id]) state[id] = {};
+  state[id].done = !state[id].done;
+  saveState(state);
+  const cb = document.getElementById(`cb-${id}`);
+  cb.classList.toggle('checked', state[id].done);
+  updateStats();
+  const week = PLAN.find(w => w.sessions.some(s => s.id === id));
+  renderTracker();
+  if (week) {
+    const el = document.getElementById(`sessions-${week.w}`);
+    const arrow = document.getElementById(`arrow-${week.w}`);
+    if (el) { el.classList.add('open'); arrow.textContent = '▼'; }
+  }
+}
+
+function autoSave(id) { collectAndSave(id); }
+function manualSave(id) {
+  collectAndSave(id);
+  const badge = document.getElementById(`saved-${id}`);
+  badge.style.display = 'inline';
+  setTimeout(() => badge.style.display = 'none', 2000);
+}
+function collectAndSave(id) {
+  if (!state[id]) state[id] = {};
+  ['date','km','dur','pace','hr','elev','note'].forEach(f => {
+    const el = document.getElementById(`f-${f}-${id}`);
+    if (el) state[id][f] = el.value;
+  });
+  saveState(state);
+}
+
+function updateStats() {
+  let done = 0, totalKm = 0, weeksComplete = 0;
+  const total = PLAN.reduce((a, w) => a + w.sessions.length, 0);
+  PLAN.forEach(week => {
+    const allDone = week.sessions.every(s => state[s.id]?.done);
+    if (allDone) weeksComplete++;
+    week.sessions.forEach(s => {
+      if (state[s.id]?.done) {
+        done++;
+        totalKm += parseFloat(state[s.id]?.km) || s.km;
+      }
+    });
+  });
+  const pct = Math.round((done / total) * 100);
+  document.getElementById('stat-done').textContent = done;
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-km').textContent = totalKm.toFixed(1);
+  document.getElementById('stat-weeks').textContent = weeksComplete;
+  document.getElementById('stat-pct').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+// ── AI COACH ───────────────────────────────────────────────────────────────
+async function callAICoach() {
+  const box = document.getElementById('ai-response-box');
+  const textEl = document.getElementById('ai-response-text');
+  box.classList.add('visible');
+  textEl.innerHTML = '<div class="ai-loading">Analisi in corso <div class="ai-loading-dots"><span>●</span><span>●</span><span>●</span></div></div>';
+
+  // Build summary of training data
+  let sessionsSummary = [];
+  let totalDone = 0, totalKm = 0, totalSessions = 0;
+  PLAN.forEach(week => {
+    week.sessions.forEach(s => {
+      totalSessions++;
+      const d = state[s.id];
+      if (d?.done) {
+        totalDone++;
+        const km = parseFloat(d.km) || s.km;
+        totalKm += km;
+        sessionsSummary.push({
+          settimana: week.w,
+          giorno: s.day,
+          nome: s.name,
+          kmPrevisti: s.km,
+          kmPercorsi: d.km || s.km,
+          durata: d.dur || '-',
+          ritmo: d.pace || '-',
+          fc: d.hr || '-',
+          dislivello: d.elev || '-',
+          note: d.note || ''
+        });
+      }
+    });
+  });
+
+  const prompt = `Sei un coach di corsa esperto. L'atleta si sta preparando per la Mezza Maratona di Re→Venaria l'11 ottobre 2026, obiettivo sotto le 2 ore.
+
+Dati del piano: 20 settimane, 2 corse/settimana (giovedì qualità + domenica lungo), profilo ondulato, livello intermedio. Ha avuto un'artroscopia al menisco del ginocchio destro 3 anni fa.
+
+Andamento attuale:
+- Sessioni completate: ${totalDone} su ${totalSessions}
+- Km totali percorsi: ${totalKm.toFixed(1)} km
+- Sessioni completate dettaglio:
+${sessionsSummary.length === 0 ? '  Nessuna sessione ancora registrata.' : sessionsSummary.map(s => `  Sett.${s.settimana} ${s.giorno}: ${s.nome} | km: ${s.kmPercorsi} | durata: ${s.durata} | ritmo: ${s.ritmo}/km | FC: ${s.fc} bpm | dislivello: ${s.dislivello}m${s.note ? ' | note: '+s.note : ''}`).join('\n')}
+
+Fornisci un'analisi in italiano di massimo 200 parole che includa:
+1. Valutazione dell'andamento generale (positiva o con aree di miglioramento)
+2. Eventuali segnali da monitorare (ritmi, FC, note sul ginocchio)
+3. 2-3 consigli pratici concreti per le prossime settimane
+Usa un tono diretto e motivante da coach. Rispondi SOLO con il testo del commento, senza intestazioni o formattazioni markdown.`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await response.json();
+    const text = data.content?.find(b => b.type === 'text')?.text || 'Nessuna risposta ricevuta.';
+    textEl.textContent = text;
+  } catch (err) {
+    textEl.textContent = 'Errore nella connessione al Coach AI. Riprova tra qualche istante.';
+  }
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+renderTracker();
+</script>
+</body>
+</html>
