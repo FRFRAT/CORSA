@@ -132,9 +132,9 @@ export default function App(){
   const [aiLoad,setAiLoad]=useState(false);
   const [aiVis,setAiVis]=useState(false);
 
-  useEffect(()=>{(async()=>{try{const r=await window.storage.get(KEY);if(r?.value)setSt(JSON.parse(r.value));}catch{}})();},[]);
+  useEffect(()=>{(async()=>{try{const saved=localStorage.getItem(KEY);if(saved)setSt(JSON.parse(saved));}catch{}})();},[]);
 
-  const save=async(next)=>{setSt(next);try{await window.storage.set(KEY,JSON.stringify(next));}catch{}};
+  const save=async(next)=>{setSt(next);try{localStorage.setItem(KEY,JSON.stringify(next));}catch{}};
   const togDone=id=>save({...st,[id]:{...st[id],done:!st[id]?.done}});
   const updF=(id,f,v)=>save({...st,[id]:{...st[id],[f]:v}});
   const togW=w=>setOpen(o=>({...o,[w]:!o[w]}));
@@ -150,7 +150,7 @@ export default function App(){
     PLAN.forEach(w=>w.ss.forEach(s=>{const d=st[s.id];if(d?.done)lines.push(`W${w.w} ${s.day}: ${s.name} | km:${d.km||s.km} | dur:${d.dur||"-"} | ritmo:${d.pace||"-"} | FC:${d.hr||"-"} | D+:${d.elev||"-"}m${d.note?" | "+d.note:""}`);;}));
     const prompt=`Sei un coach di corsa esperto. L'atleta si prepara per la Mezza Maratona Re→Venaria l'11 ottobre 2026, obiettivo sub 2h. Piano 20 settimane, 2 corse/settimana, profilo ondulato, livello intermedio. Artroscopia menisco ginocchio destro 3 anni fa.\n\nSessioni: ${done}/${tot}. Km: ${km.toFixed(1)}.\n${lines.length?"Dettaglio:\n"+lines.join("\n"):"Nessuna sessione registrata."}\n\nAnalisi in italiano max 200 parole: 1) valutazione andamento 2) segnali da monitorare 3) 2-3 consigli concreti. Tono diretto e motivante. Solo testo.`;
     try{
-      const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:800,messages:[{role:"user",content:prompt}]})});
+      const r=await fetch("/api/coach",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:800,messages:[{role:"user",content:prompt}]})});
       const data=await r.json();
       setAiTxt(data.content?.find(b=>b.type==="text")?.text||"Nessuna risposta.");
     }catch{setAiTxt("Errore. Riprova.");}
